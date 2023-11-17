@@ -11,3 +11,5 @@ include_directories(lib/googletest-main/googlemock/include)
 set(SOURCE_FILES main.cpp tests/life_backend_tests.cpp)
 add_executable(gtestset ${SOURCE_FILES})
 target_link_libraries(gtestset gtest gtest_main game_of_life)
+
+enable_testing()
