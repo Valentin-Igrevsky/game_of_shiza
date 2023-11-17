@@ -1,0 +1,50 @@
+#include "gtest/gtest.h"
+#include "../../game_of_life//life_backend/include/Life.h"
+
+TEST(life_backend, Constructor) {
+    ASSERT_THROW(life_backend::Life(1,1), life_backend::LifeException);
+    ASSERT_THROW(life_backend::Life(3,1), life_backend::LifeException);
+    ASSERT_THROW(life_backend::Life(1,3), life_backend::LifeException);
+
+    life_backend::Life a(3,4);
+    ASSERT_EQ(a.getWidth(), 3);
+    ASSERT_EQ(a.getHeight(), 4);
+    ASSERT_EQ(a.getCellStates(), std::vector<bool>({0,0,0,0,0,0,0,0,0,0,0,0}));
+}
+
+TEST(life_backend, setCellStates) {
+    life_backend::Life a(3,4);
+    a.setCellAlive(0, 0);
+    a.setCellAlive(1, 0);
+    a.setCellAlive(0, 1);
+    a.setCellAlive(2, 3);
+    ASSERT_EQ(a.getCellStates(), std::vector<bool>({1,1,0,1,0,0,0,0,0,0,0,1}));
+
+    a.setCellDead(1, 0);
+    a.setCellDead(2, 3);
+    ASSERT_EQ(a.getCellStates(), std::vector<bool>({1,0,0,1,0,0,0,0,0,0,0,0}));
+
+    ASSERT_THROW(a.setCellAlive(-1, 0), life_backend::LifeException);
+    ASSERT_THROW(a.setCellDead(3, 3), life_backend::LifeException);
+}
+
+TEST(life_backend, ostream) {
+    life_backend::Life a(3,4);
+    a.setCellAlive(0, 0);
+    a.setCellAlive(1, 0);
+    a.setCellAlive(0, 1);
+    a.setCellAlive(2, 3);
+    std::stringstream ss;
+    ss << a;
+    ASSERT_STREQ(ss.str().c_str(), "* * .\n* . .\n. . .\n. . *\n");
+}
+
+TEST(life_backend, updateCellStates) {
+    life_backend::Life a(3,4);
+    a.setCellAlive(0, 0);
+    a.setCellAlive(1, 0);
+    a.setCellAlive(0, 1);
+    a.setCellAlive(2, 3);
+    a.updateCellStates();
+    ASSERT_EQ(a.getCellStates(), std::vector<bool>({1,1,0,1,1,1,0,0,0,1,1,1}));
+}
