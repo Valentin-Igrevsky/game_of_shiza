@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../include/Life.h"
 #include <iostream>
 #include <random>

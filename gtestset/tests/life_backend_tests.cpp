@@ -48,3 +48,14 @@ TEST(life_backend, updateCellStates) {
     a.updateCellStates();
     ASSERT_EQ(a.getCellStates(), std::vector<bool>({1,1,0,1,1,1,0,0,0,1,1,1}));
 }
+
+TEST(life_backend, getAliveNeighbourCount) {
+    life_backend::Life a(3, 4);
+    a.setCellAlive(0, 0);
+    a.setCellAlive(1, 0);
+    a.setCellAlive(0, 1);
+    a.setCellAlive(2, 3);
+    ASSERT_EQ(a.getAliveNeighbourCount(0,0), 3);
+    ASSERT_EQ(a.getAliveNeighbourCount(1,2), 2);
+    ASSERT_EQ(a.getAliveNeighbourCount(0,3), 3);
+}
