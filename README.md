@@ -34,12 +34,12 @@ ___
 
 ___
 
-### [UPD v2.1](https://github.com/Valentin-Igrevsky/game_of_jiza/commit/5ba9ab63a212d94eb9f1d0727cdb8e900f788dbfv/ "commit SDL2 lib")
+### [UPD v2.1](https://github.com/Valentin-Igrevsky/game_of_jiza/commit/5ba9ab63a212d94eb9f1d0727cdb8e900f788dbf/ "commit SDL2 lib")
 * В удаленный репозиторий добавлена библиотека SDL2
 
 ___
 
-### [UPD v2.2]()
+### [UPD v2.2](https://github.com/Valentin-Igrevsky/game_of_jiza/commit/806e67b6db4d8bb4efe34ea46152249e310502c9/ "add README.md")
 * Добавлен README.md
   * Patch note
   * Tasks
