@@ -37,6 +37,12 @@ namespace life_backend {
 
         void fillRandomStates();
 
+        void clear();
+
+        bool fillCoolestStates();
+
+        bool USSR();
+
     private:
         void setCellStates(size_t x, size_t y, bool state);
 
@@ -44,14 +50,13 @@ namespace life_backend {
 
         void isCorrectCoordinates(size_t x, size_t y) const;
 
-
         size_t width_;
         size_t height_;
         std::vector<bool> cell_states_;
     };
 }
 
-extern "C" {
-    EXPORT void *create_life(size_t width, size_t height);
-    EXPORT void destroy_life(void *life);
-}
+//extern "C" {
+//    EXPORT void *create_life(size_t width, size_t height);
+//    EXPORT void destroy_life(void *life);
+//}

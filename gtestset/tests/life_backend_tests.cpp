@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../../game_of_life//life_backend/include/Life.h"
+#include "life_backend.h"
 
 TEST(life_backend, Constructor) {
     ASSERT_THROW(life_backend::Life(1,1), life_backend::LifeException);
