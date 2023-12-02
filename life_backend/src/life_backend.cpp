@@ -117,6 +117,37 @@ namespace life_backend {
         }
     }
 
+    void Life::resize(long long int newWidth, long long int newHeight) {
+        long long int deltaX = newWidth - static_cast<long long int>(width_);
+        long long int deltaY = newHeight - static_cast<long long int>(height_);
+
+        std::vector<bool>::iterator iter;
+
+        unsigned int pos;
+
+        if (deltaX > 0) {
+            for (size_t y = 0; y < height_; ++y) {
+                iter = cell_states_.begin() + static_cast<unsigned int>(width_ + newWidth * y);
+                cell_states_.insert(iter, deltaX, false);
+            }
+        } else if (deltaX < 0) {
+            for (size_t y = 0; y < height_; ++y) {
+                pos = static_cast<unsigned int>((width_ + deltaX) * (y + 1));
+                iter = cell_states_.begin() + pos;
+                cell_states_.erase(iter, iter - deltaX);
+            }
+        }
+
+        if (deltaY > 0) {
+            cell_states_.insert(cell_states_.cend(), deltaY * newWidth, false);
+        } else if (deltaY < 0) {
+            cell_states_.erase(cell_states_.begin() + newHeight*newWidth, cell_states_.end());
+        }
+
+        width_ = newWidth;
+        height_ = newHeight;
+    }
+
     bool Life::fillCoolestStates() {
         if (width_ >= 37 and height_ >= 30) {
             this->clear();
@@ -816,6 +847,102 @@ namespace life_backend {
             setCellAlive(1, 29);
             setCellAlive(27, 29);
             setCellAlive(28, 29);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool Life::ZRUSZ() {
+        if (width_ >= 18 && height_ >= 14) {
+            this->clear();
+            setCellAlive(3, 2);
+            setCellAlive(4, 2);
+            setCellAlive(5, 2);
+            setCellAlive(6, 2);
+            setCellAlive(7, 2);
+            setCellAlive(8, 2);
+            setCellAlive(9, 2);
+            setCellAlive(10, 2);
+            setCellAlive(11, 2);
+            setCellAlive(12, 2);
+            setCellAlive(13, 2);
+            setCellAlive(14, 2);
+            setCellAlive(3, 3);
+            setCellAlive(4, 3);
+            setCellAlive(8, 3);
+            setCellAlive(9, 3);
+            setCellAlive(10, 3);
+            setCellAlive(11, 3);
+            setCellAlive(12, 3);
+            setCellAlive(13, 3);
+            setCellAlive(14, 3);
+            setCellAlive(3, 4);
+            setCellAlive(7, 4);
+            setCellAlive(8, 4);
+            setCellAlive(9, 4);
+            setCellAlive(10, 4);
+            setCellAlive(11, 4);
+            setCellAlive(12, 4);
+            setCellAlive(13, 4);
+            setCellAlive(7, 5);
+            setCellAlive(8, 5);
+            setCellAlive(9, 5);
+            setCellAlive(10, 5);
+            setCellAlive(11, 5);
+            setCellAlive(12, 5);
+            setCellAlive(6, 6);
+            setCellAlive(7, 6);
+            setCellAlive(8, 6);
+            setCellAlive(9, 6);
+            setCellAlive(10, 6);
+            setCellAlive(11, 6);
+            setCellAlive(12, 6);
+            setCellAlive(5, 7);
+            setCellAlive(6, 7);
+            setCellAlive(7, 7);
+            setCellAlive(8, 7);
+            setCellAlive(9, 7);
+            setCellAlive(10, 7);
+            setCellAlive(11, 7);
+            setCellAlive(4, 8);
+            setCellAlive(5, 8);
+            setCellAlive(6, 8);
+            setCellAlive(7, 8);
+            setCellAlive(8, 8);
+            setCellAlive(9, 8);
+            setCellAlive(10, 8);
+            setCellAlive(15, 8);
+            setCellAlive(4, 9);
+            setCellAlive(5, 9);
+            setCellAlive(6, 9);
+            setCellAlive(7, 9);
+            setCellAlive(8, 9);
+            setCellAlive(9, 9);
+            setCellAlive(14, 9);
+            setCellAlive(15, 9);
+            setCellAlive(3, 10);
+            setCellAlive(4, 10);
+            setCellAlive(5, 10);
+            setCellAlive(6, 10);
+            setCellAlive(7, 10);
+            setCellAlive(8, 10);
+            setCellAlive(9, 10);
+            setCellAlive(13, 10);
+            setCellAlive(14, 10);
+            setCellAlive(2, 11);
+            setCellAlive(3, 11);
+            setCellAlive(4, 11);
+            setCellAlive(5, 11);
+            setCellAlive(6, 11);
+            setCellAlive(7, 11);
+            setCellAlive(8, 11);
+            setCellAlive(9, 11);
+            setCellAlive(10, 11);
+            setCellAlive(11, 11);
+            setCellAlive(12, 11);
+            setCellAlive(13, 11);
+            setCellAlive(14, 11);
             return true;
         } else {
             return false;

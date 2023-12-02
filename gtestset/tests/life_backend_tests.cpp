@@ -59,3 +59,14 @@ TEST(life_backend, getAliveNeighbourCount) {
     ASSERT_EQ(a.getAliveNeighbourCount(1,2), 2);
     ASSERT_EQ(a.getAliveNeighbourCount(0,3), 3);
 }
+
+void print(std::vector<bool> &vec) {
+    for(auto && i : vec) {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+}
+
+TEST(life_backend, resize) {
+// Написать тесты для .resize()
+}

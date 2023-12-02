@@ -39,9 +39,13 @@ namespace life_backend {
 
         void clear();
 
+        void resize(long long int newWidth, long long int newHeight);
+
         bool fillCoolestStates();
 
         bool USSR();
+
+        bool ZRUSZ();
 
     private:
         void setCellStates(size_t x, size_t y, bool state);
