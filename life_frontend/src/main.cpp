@@ -265,7 +265,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                                                 width * cellSizeX + 1, height * cellSizeY + 1,
                                                 SDL_WINDOW_RESIZABLE);
 
-    SDL_Surface* icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);
+    SDL_Surface* icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);  // ленька
     if (icon != nullptr){
         front.SDL_SetWindowIcon(window, icon);
         front.SDL_FreeSurface(icon);
