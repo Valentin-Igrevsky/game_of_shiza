@@ -1,5 +1,6 @@
 #include "life_frontend.h"
 #include "SDL.h"
+#include "SDL_rwops.h"
 #include <Windows.h>
 
 life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
@@ -44,6 +45,16 @@ life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
     SDL_SetWindowSize_Func = (void (*)(SDL_Window *, int, int)) GetProcAddress(sdl_lib_handle, "SDL_SetWindowSize");
 
     SDL_GetWindowGrab_Func = (SDL_bool (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowGrab");
+
+    SDL_RWFromFile_Func = (SDL_RWops* (*)(const char *, const char *)) GetProcAddress(sdl_lib_handle, "SDL_RWFromFile");
+
+    SDL_LoadBMP_RW_Func = (SDL_Surface* (*)(SDL_RWops *, int)) GetProcAddress(sdl_lib_handle, "SDL_LoadBMP_RW");
+
+    SDL_SetWindowIcon_Func = (void (*)(SDL_Window *, SDL_Surface *)) GetProcAddress(sdl_lib_handle, "SDL_SetWindowIcon");
+
+    SDL_FreeSurface_Func = (void (*)(SDL_Surface *)) GetProcAddress(sdl_lib_handle, "SDL_FreeSurface");
+
+    IMG_Load_Func = (SDL_Surface* (*)(const char *)) GetProcAddress(sdl_lib_handle, "IMG_Load");
 }
 
 life_frontend::life_frontend::~life_frontend() {
@@ -155,4 +166,24 @@ void life_frontend::life_frontend::SDL_SetWindowSize(SDL_Window * window, int w,
 
 SDL_bool life_frontend::life_frontend::SDL_GetWindowGrab(SDL_Window * window) {
     return SDL_GetWindowGrab_Func(window);
+}
+
+SDL_RWops* life_frontend::life_frontend::SDL_RWFromFile(const char * file, const char * mode) {
+    return SDL_RWFromFile_Func(file, mode);
+}
+
+SDL_Surface* life_frontend::life_frontend::SDL_LoadBMP_RW(SDL_RWops * src, int freesrc) {
+    return SDL_LoadBMP_RW_Func(src, freesrc);
+}
+
+void life_frontend::life_frontend::SDL_SetWindowIcon(SDL_Window * window, SDL_Surface * icon) {
+    SDL_SetWindowIcon_Func(window, icon);
+}
+
+void life_frontend::life_frontend::SDL_FreeSurface(SDL_Surface * surface) {
+    SDL_FreeSurface_Func(surface);
+}
+
+SDL_Surface * life_frontend::life_frontend::IMG_Load(const char *file) {
+    return IMG_Load_Func(file);
 }
