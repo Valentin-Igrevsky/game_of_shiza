@@ -1,26 +1,9 @@
-#include "SDL.h"
-#include "SDL_rwops.h"
-#include <Windows.h>
-#include <string>
-
 #pragma once
-#if defined(_WIN32) || defined(_WIN64)
-#define OS_WINDOWS
-#elif defined(__APPLE__)
-#define OS_MACOS
-#elif defined(__linux__)
-#define OS_LINUX
-#else
-#error "Unknown platform"
-#endif
-
-#ifdef OS_WINDOWS
-#define SDL_LIB_PATH "SDL2.dll"
-#elif defined(OS_MACOS)
-#define SDL_LIB_PATH "libSDL2.dylib"
-#elif defined(OS_LINUX)
-#define SDL_LIB_PATH "libSDL2.so"
-#endif
+#define SDL_MAIN_HANDLED
+#include "SDL.h"
+#include <Windows.h>
+#include "SDL_rwops.h"
+#include <string>
 
 namespace life_frontend {
     class life_frontend {
@@ -144,10 +127,5 @@ namespace life_frontend {
         void (*SDL_FreeSurface_Func)(SDL_Surface * surface) = nullptr;
 
         SDL_Surface* (*IMG_Load_Func)(const char *file) = nullptr;
-//    bool isRunning;
-//    SDL_Window* window;
-//    SDL_Renderer* renderer;
     };
 }
-
-

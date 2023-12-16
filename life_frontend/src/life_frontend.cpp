@@ -1,6 +1,4 @@
 #include "life_frontend.h"
-#include "SDL.h"
-#include "SDL_rwops.h"
 #include <Windows.h>
 
 life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
@@ -26,15 +24,18 @@ life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
     SDL_PollEvent_Func = (int (*)(SDL_Event *)) GetProcAddress(sdl_lib_handle, "SDL_PollEvent");
     SDL_DestroyRenderer_Func = (void (*)(SDL_Renderer *)) GetProcAddress(sdl_lib_handle, "SDL_DestroyRenderer");
 
-    SDL_GetWindowSurface_Func = (SDL_Surface * (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowSurface");
+    SDL_GetWindowSurface_Func = (SDL_Surface *(*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowSurface");
 
-    SDL_FillRect_Func = (int (*)(SDL_Surface *, const SDL_Rect *, Uint32)) GetProcAddress(sdl_lib_handle, "SDL_FillRect");
+    SDL_FillRect_Func = (int (*)(SDL_Surface *, const SDL_Rect *, Uint32)) GetProcAddress(sdl_lib_handle,
+                                                                                          "SDL_FillRect");
 
     SDL_UpdateWindowSurface_Func = (int (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_UpdateWindowSurface");
 
-    SDL_MapRGB_Func = (Uint32 (*)(const SDL_PixelFormat *, Uint8, Uint8, Uint8)) GetProcAddress(sdl_lib_handle, "SDL_MapRGB");
+    SDL_MapRGB_Func = (Uint32 (*)(const SDL_PixelFormat *, Uint8, Uint8, Uint8)) GetProcAddress(sdl_lib_handle,
+                                                                                                "SDL_MapRGB");
 
-    SDL_SetWindowTitle_Func = (void (*)(SDL_Window *, const char *)) GetProcAddress(sdl_lib_handle, "SDL_SetWindowTitle");
+    SDL_SetWindowTitle_Func = (void (*)(SDL_Window *, const char *)) GetProcAddress(sdl_lib_handle,
+                                                                                    "SDL_SetWindowTitle");
 
     SDL_GetMouseState_Func = (Uint32 (*)(int *, int *)) GetProcAddress(sdl_lib_handle, "SDL_GetMouseState");
 
@@ -46,15 +47,16 @@ life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
 
     SDL_GetWindowGrab_Func = (SDL_bool (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowGrab");
 
-    SDL_RWFromFile_Func = (SDL_RWops* (*)(const char *, const char *)) GetProcAddress(sdl_lib_handle, "SDL_RWFromFile");
+    SDL_RWFromFile_Func = (SDL_RWops *(*)(const char *, const char *)) GetProcAddress(sdl_lib_handle, "SDL_RWFromFile");
 
-    SDL_LoadBMP_RW_Func = (SDL_Surface* (*)(SDL_RWops *, int)) GetProcAddress(sdl_lib_handle, "SDL_LoadBMP_RW");
+    SDL_LoadBMP_RW_Func = (SDL_Surface *(*)(SDL_RWops *, int)) GetProcAddress(sdl_lib_handle, "SDL_LoadBMP_RW");
 
-    SDL_SetWindowIcon_Func = (void (*)(SDL_Window *, SDL_Surface *)) GetProcAddress(sdl_lib_handle, "SDL_SetWindowIcon");
+    SDL_SetWindowIcon_Func = (void (*)(SDL_Window *, SDL_Surface *)) GetProcAddress(sdl_lib_handle,
+                                                                                    "SDL_SetWindowIcon");
 
     SDL_FreeSurface_Func = (void (*)(SDL_Surface *)) GetProcAddress(sdl_lib_handle, "SDL_FreeSurface");
 
-    IMG_Load_Func = (SDL_Surface* (*)(const char *)) GetProcAddress(sdl_lib_handle, "IMG_Load");
+    IMG_Load_Func = (SDL_Surface *(*)(const char *)) GetProcAddress(sdl_lib_handle, "IMG_Load");
 }
 
 life_frontend::life_frontend::~life_frontend() {
@@ -67,7 +69,8 @@ int life_frontend::life_frontend::SDL_Init(Uint32 flags) {
 
 }
 
-SDL_Window *life_frontend::life_frontend::SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags) {
+SDL_Window *
+life_frontend::life_frontend::SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags) {
     return SDL_CreateWindow_Func(title, x, y, w, h, flags);
 
 }
@@ -128,62 +131,62 @@ void life_frontend::life_frontend::SDL_RenderDrawLine(SDL_Renderer *renderer, in
     SDL_RenderDrawLine_Func(renderer, x1, y1, x2, y2);
 }
 
-SDL_Surface * life_frontend::life_frontend::SDL_GetWindowSurface(SDL_Window * window) {
+SDL_Surface *life_frontend::life_frontend::SDL_GetWindowSurface(SDL_Window *window) {
     return SDL_GetWindowSurface_Func(window);
 }
 
-int life_frontend::life_frontend::SDL_FillRect(SDL_Surface * dst, const SDL_Rect * rect, Uint32 color) {
+int life_frontend::life_frontend::SDL_FillRect(SDL_Surface *dst, const SDL_Rect *rect, Uint32 color) {
     return SDL_FillRect_Func(dst, rect, color);
 }
 
-int life_frontend::life_frontend::SDL_UpdateWindowSurface(SDL_Window * window) {
+int life_frontend::life_frontend::SDL_UpdateWindowSurface(SDL_Window *window) {
     return SDL_UpdateWindowSurface_Func(window);
 }
 
-Uint32 life_frontend::life_frontend::SDL_MapRGB(const SDL_PixelFormat * format, Uint8 r, Uint8 g, Uint8 b) {
+Uint32 life_frontend::life_frontend::SDL_MapRGB(const SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b) {
     return SDL_MapRGB_Func(format, r, g, b);
 }
 
-void life_frontend::life_frontend::SDL_SetWindowTitle(SDL_Window * window, const char * title) {
+void life_frontend::life_frontend::SDL_SetWindowTitle(SDL_Window *window, const char *title) {
     SDL_SetWindowTitle_Func(window, title);
 }
 
-Uint32 life_frontend::life_frontend::SDL_GetMouseState(int * x, int * y) {
+Uint32 life_frontend::life_frontend::SDL_GetMouseState(int *x, int *y) {
     return SDL_GetMouseState_Func(x, y);
 }
 
-void life_frontend::life_frontend::SDL_SetWindowGrab(SDL_Window * window, SDL_bool grabbed) {
+void life_frontend::life_frontend::SDL_SetWindowGrab(SDL_Window *window, SDL_bool grabbed) {
     SDL_SetWindowGrab_Func(window, grabbed);
 }
 
-void life_frontend::life_frontend::SDL_GetWindowSize(SDL_Window * window, int * w, int * h) {
+void life_frontend::life_frontend::SDL_GetWindowSize(SDL_Window *window, int *w, int *h) {
     SDL_GetWindowSize_Func(window, w, h);
 }
 
-void life_frontend::life_frontend::SDL_SetWindowSize(SDL_Window * window, int w, int h) {
+void life_frontend::life_frontend::SDL_SetWindowSize(SDL_Window *window, int w, int h) {
     SDL_SetWindowSize_Func(window, w, h);
 }
 
-SDL_bool life_frontend::life_frontend::SDL_GetWindowGrab(SDL_Window * window) {
+SDL_bool life_frontend::life_frontend::SDL_GetWindowGrab(SDL_Window *window) {
     return SDL_GetWindowGrab_Func(window);
 }
 
-SDL_RWops* life_frontend::life_frontend::SDL_RWFromFile(const char * file, const char * mode) {
+SDL_RWops *life_frontend::life_frontend::SDL_RWFromFile(const char *file, const char *mode) {
     return SDL_RWFromFile_Func(file, mode);
 }
 
-SDL_Surface* life_frontend::life_frontend::SDL_LoadBMP_RW(SDL_RWops * src, int freesrc) {
+SDL_Surface *life_frontend::life_frontend::SDL_LoadBMP_RW(SDL_RWops *src, int freesrc) {
     return SDL_LoadBMP_RW_Func(src, freesrc);
 }
 
-void life_frontend::life_frontend::SDL_SetWindowIcon(SDL_Window * window, SDL_Surface * icon) {
+void life_frontend::life_frontend::SDL_SetWindowIcon(SDL_Window *window, SDL_Surface *icon) {
     SDL_SetWindowIcon_Func(window, icon);
 }
 
-void life_frontend::life_frontend::SDL_FreeSurface(SDL_Surface * surface) {
+void life_frontend::life_frontend::SDL_FreeSurface(SDL_Surface *surface) {
     SDL_FreeSurface_Func(surface);
 }
 
-SDL_Surface * life_frontend::life_frontend::IMG_Load(const char *file) {
+SDL_Surface *life_frontend::life_frontend::IMG_Load(const char *file) {
     return IMG_Load_Func(file);
 }

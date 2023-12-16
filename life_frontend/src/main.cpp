@@ -1,7 +1,21 @@
+#ifdef APPLE
+#include <mach-o/dyld.h>
+#endif
+#if defined(_WIN32)
+
+#include <windows.h>
+
+#else
+#include <unistd.h>
+#endif
+
+#include <filesystem>
+#include "variables.h"
+
+
 #include "life_backend.h"
 #include "life_frontend.h"
-#include <string>
-#include "Windows.h"
+
 
 static int R = 255;
 static int G = 0;
@@ -11,7 +25,6 @@ static std::vector<int> speedRGB = {1, 5, 17, 51, 85};
 static bool quit = false;
 static bool reTitle = false;
 static bool reRender = false;
-static bool reRenderWin = true;
 static bool isPlay = true;
 static bool isMeme = false;
 static bool isDraw = false;
@@ -49,21 +62,21 @@ void createNewTitle() {
     else title += " [RGB: OFF]";
 }
 
-void resizeGame(SDL_Window *window, life_frontend::life_frontend &front, life_backend::Life &life, int newWidth, int newHeight) {
+void resizeGame(SDL_Window *window, life_frontend::life_frontend &front, life_backend::Life &life, int newWidth,
+                int newHeight) {
     int newCols = newWidth / cellSizeX;
     int newRows = newHeight / cellSizeY;
     life.resize(newCols, newRows);
     front.SDL_SetWindowSize(window, cellSizeX * newCols + 1, cellSizeY * newRows + 1);
-    reRenderWin = true;
 }
 
-void resizeWindow(SDL_Window *window, life_frontend::life_frontend &front, life_backend::Life &life, int newWidth, int newHeight) {
+void resizeWindow(SDL_Window *window, life_frontend::life_frontend &front, life_backend::Life &life, int newWidth,
+                  int newHeight) {
     int numRows = static_cast<int>(life.getHeight());
     int numCols = static_cast<int>(life.getWidth());
     cellSizeX = newWidth / numCols;
     cellSizeY = newHeight / numRows;
     front.SDL_SetWindowSize(window, cellSizeX * numCols + 1, cellSizeY * numRows + 1);
-    reRenderWin = true;
 }
 
 
@@ -84,13 +97,6 @@ void draw(life_backend::Life &life, int xMouse, int yMouse) {
 }
 
 void renderWindowWithGrid(SDL_Renderer *renderer, life_frontend::life_frontend &front, life_backend::Life &life) {
-
-    if (reRenderWin) {
-        front.SDL_SetRenderDrawColor(renderer, R, G, B, 255);
-        front.SDL_RenderClear(renderer);
-        front.SDL_RenderPresent(renderer);
-        reRenderWin = false;
-    }
 
     int numRows = life.getHeight();
     int numCols = life.getWidth();
@@ -243,10 +249,41 @@ void events(SDL_Window *window, life_frontend::life_frontend &front, life_backen
 /// RMB - set ded cell
 /// MB + move - draw with type of cell
 
+namespace {
+    std::filesystem::path getExecutablePath() {
+        char path[1024];
+#if defined(_WIN32) || defined(_WIN64)
+        GetModuleFileName(NULL, path, sizeof(path));
+        return std::string(path);
+#elif defined(__linux__)
+        ssize_t len = ::readlink("/proc/self/exe", path, sizeof(path) - 1);
+        if (len != -1)
+        {
+            path[len] = '\0';
+            return std::string(path);
+        }
+#elif defined(__APPLE__)
+        uint32_t size = sizeof(path);
+        if (_NSGetExecutablePath(path, &size) == 0) {
+            return std::filesystem::path(std::string(path));
+        }
+#endif
 
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-    const std::string lib_path = "D:\\game_of_shiza\\cmake-build-debug\\SDL2.dll";
-    life_frontend::life_frontend front(lib_path);
+        return std::string();
+    }
+}
+
+#if defined(_WIN32) || defined(_WIN64)
+    int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+#elif defined(__linux__)
+    int main(int argc, char **argv)
+#endif
+{
+    auto pathToExecutable = ::getExecutablePath();
+    auto pathToDirWhereExecutable = std::filesystem::path(pathToExecutable.string()).parent_path().parent_path();
+    std::string SDL_LIBRARY_NAME = MY_VARIABLE;
+    auto pathToSdlLibrary = pathToDirWhereExecutable / "life_frontend" / MY_VARIABLE;
+    life_frontend::life_frontend front(pathToSdlLibrary.string());
 
     life_backend::Life life(15, 15);
 
@@ -255,9 +292,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
     createNewTitle();
 
-
     front.SDL_Init(SDL_INIT_VIDEO);
-
 
 
     SDL_Window *window = front.SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
@@ -265,8 +300,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                                                 width * cellSizeX + 1, height * cellSizeY + 1,
                                                 SDL_WINDOW_RESIZABLE);
 
-    SDL_Surface* icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);  // ленька
-    if (icon != nullptr){
+    SDL_Surface *icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);  // ленька
+    if (icon != nullptr) {
         front.SDL_SetWindowIcon(window, icon);
         front.SDL_FreeSurface(icon);
     }
@@ -303,3 +338,4 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     front.SDL_Quit();
     return 0;
 }
+//}

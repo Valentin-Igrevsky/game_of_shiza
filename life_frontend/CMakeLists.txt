@@ -13,42 +13,46 @@ set(HEADERS
         include/life_frontend.h
 )
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    add_executable(life_frontend WIN32 ${SOURCES} ${HEADERS})
-    target_include_directories(life_frontend PUBLIC include)
-    target_include_directories(life_frontend PRIVATE src)
-#    set(path ${CMAKE_SOURCE_DIR}/cmake-build-debug/life_backend/life_backend.dll)
-#    add_library(life_backend SHARED ${path})
-    set_target_properties(life_backend PROPERTIES LINKER_LANGUAGE CXX)
-#    target_link_libraries(life_frontend PUBLIC life_backend)
-    set_target_properties(life_frontend PROPERTIES OUTPUT_NAME "life_frontend")
-    set(Library_path $<TARGET_FILE:life_frontend>)
-    set(out_path $<TARGET_FILE_DIR:life_frontend>)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-delete-incomplete")
-    add_library(life_frontend SHARED ${SOURCES} ${HEADERS})
-    target_include_directories(life_frontend PUBLIC include)
-    set_target_properties(life_frontend PROPERTIES OUTPUT_NAME "life_frontend")
-    set(Library_path $<TARGET_FILE:life_frontend>)
-    set(out_path $<TARGET_FILE_DIR:life_frontend>)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-delete-incomplete")
-    add_library(life_frontend SHARED ${SOURCES} ${HEADERS})
-    target_include_directories(life_frontend PUBLIC include)
-    set_target_properties(life_frontend PROPERTIES OUTPUT_NAME "life_frontend")
-    set(Library_path $<TARGET_FILE:life_frontend>)
-    set(out_path $<TARGET_FILE_DIR:life_frontend>)
+set(DYNAMIC_LIBS_PATH ${CMAKE_SOURCE_DIR})
+
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+    message("Target architecture: ARM")
+    set(ARCH "arm64")
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    message("Target architecture: AMD64")
+    set(ARCH "AMD64")
+
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86")
+    message("Target architecture: x86")
+    set(ARCH "x86")
+else()
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+cmake_path(APPEND SDL_INCLUDE_PATH "${CMAKE_SOURCE_DIR}" "libraries" "include" "SDL2")
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CURRENT_OS "Linux")
+    set(CURRENT_EXT "so")
+
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(CURRENT_OS "Windows")
+    set(CURRENT_EXT "dll")
+    set(MY_VARIABLE "SDL2.${CURRENT_EXT}")
+    cmake_path(APPEND SDL_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "SDL2.${CURRENT_EXT}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${SDL_PATH_FULL} ${MY_VARIABLE}
+    )
+    message("SDL full path directory: ${SDL_PATH_FULL}")
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+            WIN32_EXECUTABLE TRUE
+    )
+
+else()
+    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
 
-#set(SDL2_LIBRARY ${CMAKE_BINARY_DIR}/SDL2.dll)
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/variables.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/variables.h)
 configure_file(src/lenya.bmp ${CMAKE_CURRENT_BINARY_DIR}/lenya.bmp COPYONLY)
-#target_link_libraries(life_frontend PRIVATE ${SDL2_LIBRARY})
-
-add_custom_command(
-        TARGET ${PROJECT_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${Library_path} ${CMAKE_BINARY_DIR}/
-)
+target_include_directories(${PROJECT_NAME} PUBLIC ${SDL_INCLUDE_PATH})
