@@ -68,5 +68,18 @@ void print(std::vector<bool> &vec) {
 }
 
 TEST(life_backend, resize) {
-// Написать тесты для .resize()
+    life_backend::Life a(2, 2);
+
+    a.resize(5, 5);
+    EXPECT_EQ(a.getWidth(), 5);
+    EXPECT_EQ(a.getHeight(), 5);
+
+    a.resize(7, 7);
+    EXPECT_EQ(a.getWidth(), 7);
+    EXPECT_EQ(a.getHeight(), 7);
+
+    a.resize(3, 3);
+    EXPECT_EQ(a.getWidth(), 3);
+    EXPECT_EQ(a.getHeight(), 3);
 }
+

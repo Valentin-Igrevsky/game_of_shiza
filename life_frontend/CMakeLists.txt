@@ -44,9 +44,8 @@ endif ()
 
 #set(SDL2_LIBRARY ${CMAKE_BINARY_DIR}/SDL2.dll)
 
-
+configure_file(src/lenya.bmp ${CMAKE_CURRENT_BINARY_DIR}/lenya.bmp COPYONLY)
 #target_link_libraries(life_frontend PRIVATE ${SDL2_LIBRARY})
-
 
 add_custom_command(
         TARGET ${PROJECT_NAME}

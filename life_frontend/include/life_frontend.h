@@ -1,4 +1,5 @@
 #include "SDL.h"
+#include "SDL_rwops.h"
 #include <Windows.h>
 #include <string>
 
@@ -74,6 +75,16 @@ namespace life_frontend {
 
         SDL_bool SDL_GetWindowGrab(SDL_Window * window);
 
+        SDL_RWops* SDL_RWFromFile(const char * file, const char * mode);
+
+        SDL_Surface* SDL_LoadBMP_RW(SDL_RWops * src, int freesrc);
+
+        void SDL_SetWindowIcon(SDL_Window * window, SDL_Surface * icon);
+
+        void SDL_FreeSurface(SDL_Surface * surface);
+
+        SDL_Surface * IMG_Load(const char *file);
+
     private:
         std::string sdl_lib_path;
         HMODULE sdl_lib_handle;
@@ -123,7 +134,16 @@ namespace life_frontend {
         void (*SDL_SetWindowSize_Func)(SDL_Window * window, int w, int h) = nullptr;
 
         SDL_bool (*SDL_GetWindowGrab_Func)(SDL_Window * window) = nullptr;
-//
+
+        SDL_RWops* (*SDL_RWFromFile_Func)(const char * file, const char * mode) = nullptr;
+
+        SDL_Surface* (*SDL_LoadBMP_RW_Func)(SDL_RWops * src, int freesrc) = nullptr;
+
+        void (*SDL_SetWindowIcon_Func)(SDL_Window * window, SDL_Surface * icon) = nullptr;
+
+        void (*SDL_FreeSurface_Func)(SDL_Surface * surface) = nullptr;
+
+        SDL_Surface* (*IMG_Load_Func)(const char *file) = nullptr;
 //    bool isRunning;
 //    SDL_Window* window;
 //    SDL_Renderer* renderer;

@@ -245,7 +245,7 @@ void events(SDL_Window *window, life_frontend::life_frontend &front, life_backen
 
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-    const std::string lib_path = "C:\\Users\\user\\CLionProjects\\GTT\\cmake-build-debug\\SDL2.dll";
+    const std::string lib_path = "D:\\game_of_shiza\\cmake-build-debug\\SDL2.dll";
     life_frontend::life_frontend front(lib_path);
 
     life_backend::Life life(15, 15);
@@ -255,13 +255,21 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
     createNewTitle();
 
+
     front.SDL_Init(SDL_INIT_VIDEO);
+
 
 
     SDL_Window *window = front.SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
                                                 SDL_WINDOWPOS_CENTERED,
                                                 width * cellSizeX + 1, height * cellSizeY + 1,
                                                 SDL_WINDOW_RESIZABLE);
+
+    SDL_Surface* icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);  // ленька
+    if (icon != nullptr){
+        front.SDL_SetWindowIcon(window, icon);
+        front.SDL_FreeSurface(icon);
+    }
 
     SDL_Renderer *renderer = front.SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
