@@ -1,3 +1,4 @@
 #pragma once
 
 #define MY_VARIABLE "@MY_VARIABLE@"
+#define SDL2MIXER "@SDL2MIXER@"

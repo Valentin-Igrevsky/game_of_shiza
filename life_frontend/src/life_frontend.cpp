@@ -1,11 +1,17 @@
 #include "life_frontend.h"
 #include <Windows.h>
 
-life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
+life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath, const std::string &sdl2mixerLibraryPath) {
     sdl_lib_path = sdlLibraryPath;
     sdl_lib_handle = LoadLibrary(sdl_lib_path.c_str());
 
+    sdl2mixer_lib_path = sdl2mixerLibraryPath;
+    sdl2mixer_lib_handle = LoadLibrary(sdl2mixer_lib_path.c_str());
+
     SDL_Init_Func = (int (*)(Uint32)) GetProcAddress(sdl_lib_handle, "SDL_Init");
+
+    Mix_Init_Func = (int (*)(int)) GetProcAddress(sdl2mixer_lib_handle, "Mix_Init");
+
     SDL_CreateWindow_Func = (SDL_Window *(*)(const char *, int, int, int, int, Uint32)) GetProcAddress(sdl_lib_handle,
                                                                                                        "SDL_CreateWindow");
     SDL_CreateRenderer_Func = (SDL_Renderer *(*)(SDL_Window *, int, Uint32)) GetProcAddress(sdl_lib_handle,
@@ -57,6 +63,20 @@ life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
     SDL_FreeSurface_Func = (void (*)(SDL_Surface *)) GetProcAddress(sdl_lib_handle, "SDL_FreeSurface");
 
     IMG_Load_Func = (SDL_Surface *(*)(const char *)) GetProcAddress(sdl_lib_handle, "IMG_Load");
+
+    Mix_OpenAudio_Func = (int (*)(int, Uint16, int, int)) GetProcAddress(sdl2mixer_lib_handle, "Mix_OpenAudio");
+
+    Mix_LoadMUS_Func = (Mix_Music * (*)(const char *)) GetProcAddress(sdl2mixer_lib_handle, "Mix_LoadMUS");
+
+    Mix_FreeMusic_Func = (void (*)(Mix_Music *)) GetProcAddress(sdl2mixer_lib_handle, "Mix_FreeMusic");
+
+    Mix_CloseAudio_Func = (void (*)(void)) GetProcAddress(sdl2mixer_lib_handle, "Mix_CloseAudio");
+
+    Mix_PlayMusic_Func = (int (*)(Mix_Music *, int)) GetProcAddress(sdl2mixer_lib_handle, "Mix_PlayMusic");
+
+    SDL_GetError_Func = (const char* (*)(void)) GetProcAddress(sdl_lib_handle, "SDL_GetError");
+
+    Mix_PlayingMusic_Func = (int (*)(void)) GetProcAddress(sdl2mixer_lib_handle, "Mix_PlayingMusic");
 }
 
 life_frontend::life_frontend::~life_frontend() {
@@ -189,4 +209,36 @@ void life_frontend::life_frontend::SDL_FreeSurface(SDL_Surface *surface) {
 
 SDL_Surface *life_frontend::life_frontend::IMG_Load(const char *file) {
     return IMG_Load_Func(file);
+}
+
+int life_frontend::life_frontend::Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
+    return Mix_OpenAudio_Func(frequency, format, channels, chunksize);
+}
+
+Mix_Music * life_frontend::life_frontend::Mix_LoadMUS(const char * file) {
+    return Mix_LoadMUS_Func(file);
+}
+
+void life_frontend::life_frontend::Mix_FreeMusic(Mix_Music * music) {
+    Mix_FreeMusic_Func(music);
+}
+
+void life_frontend::life_frontend::Mix_CloseAudio() {
+    Mix_CloseAudio_Func();
+}
+
+int life_frontend::life_frontend::Mix_PlayMusic(Mix_Music * music, int loops) {
+    return Mix_PlayMusic_Func(music, loops);
+}
+
+int life_frontend::life_frontend::Mix_Init(int flags) {
+    return Mix_Init_Func(flags);
+}
+
+const char* life_frontend::life_frontend::SDL_GetError() {
+    return SDL_GetError_Func();
+}
+
+int life_frontend::life_frontend::Mix_PlayingMusic(void) {
+    return Mix_PlayingMusic_Func();
 }

@@ -16,6 +16,7 @@
 #include "life_backend.h"
 #include "life_frontend.h"
 
+#include <thread>
 
 static int R = 255;
 static int G = 0;
@@ -282,8 +283,10 @@ namespace {
     auto pathToExecutable = ::getExecutablePath();
     auto pathToDirWhereExecutable = std::filesystem::path(pathToExecutable.string()).parent_path().parent_path();
     std::string SDL_LIBRARY_NAME = MY_VARIABLE;
+    std::string SDL2MIXER_LIBRARY_NAME = SDL2MIXER;
     auto pathToSdlLibrary = pathToDirWhereExecutable / "life_frontend" / MY_VARIABLE;
-    life_frontend::life_frontend front(pathToSdlLibrary.string());
+    auto pathToSdl2MixerLibrary = pathToDirWhereExecutable / "life_frontend" / SDL2MIXER;
+    life_frontend::life_frontend front(pathToSdlLibrary.string(), pathToSdl2MixerLibrary.string());
 
     life_backend::Life life(15, 15);
 
@@ -292,7 +295,20 @@ namespace {
 
     createNewTitle();
 
-    front.SDL_Init(SDL_INIT_VIDEO);
+    front.SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+//    front.Mix_Init(MIX_INIT_MP3);
+
+    front.Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+
+    Mix_Music *music = front.Mix_LoadMUS("D:\\game_of_shiza_3.0\\life_frontend\\src\\Freddy.wav");
+//    if (!music) {
+//        std::cerr << "Ошибка загрузки музыки: " << front.Mix_GetError() << std::endl;
+//    } else {
+//        front.Mix_PlayMusic(music, 10);
+//    }
+
+    front.Mix_PlayMusic(music, 3);
 
 
     SDL_Window *window = front.SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
@@ -308,8 +324,11 @@ namespace {
 
     SDL_Renderer *renderer = front.SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+
+
     SDL_Event event;
     while (!quit) {
+
         while (front.SDL_PollEvent(&event)) {
             events(window, front, life, event);
         }
@@ -333,6 +352,10 @@ namespace {
             front.SDL_Delay(1);
         }
     }
+    front.Mix_FreeMusic(music);
+
+    // Закрытие аудио SDL2_mixer
+    front.Mix_CloseAudio();
 
     front.SDL_DestroyWindow(window);
     front.SDL_Quit();
