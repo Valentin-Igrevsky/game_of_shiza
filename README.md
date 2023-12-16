@@ -46,7 +46,7 @@ ___
 
 ___
 
-### [UPD v2.3]()
+### [UPD v2.3](https://github.com/Valentin-Igrevsky/game_of_shiza/commit/6df6b6388400d41b2e8317f69e917cdf9a98c612/ "BugFix, Main-separation, RGB, WinResize, GameResize")
 * В backend добавлен метод resize
 * Поправлена ошибка: вылет игры при выходе мышью за границы окна
 * Поправлена ошибка: зависание игры при переходе в другое окно
@@ -56,6 +56,18 @@ ___
 * Добавлен Scale окна
 * Добавлен Resize окна
 
+___
+
+### [UPD v3.0](https://github.com/Valentin-Igrevsky/game_of_shiza/commit/b875f6dc27ffdd566116c67cc3b340e5e9c828d3/ "new CMAKE, add backend tests, add icon, bug fix")
+* Поправлена ошибка: мограние экрана при расширении на весь экран
+* Добавлены новые тесты
+* Добавлен новый функционал frontend'а
+* Добавлена иконка
+* SDL2 перенесена в отдельную папку
+* Обновлен CMakeLists.txt: frontend
+* Обновлен CMakeLists.txt: gtests
+* Обновлен CMakeLists.txt: main project
+
  ___
  ___
 
@@ -63,12 +75,9 @@ ___
 * До конца разобраться с библиотеками (SDL2)
 * Реализовать кросс-платформенность
 * Завершить файлы сборки (CMakeLists.txt)
-  * GoogleTests
-  * BackEnd
   * FrontEnd
-  * Main Project
 * Дописать необходимые функции для frontend'а (по надобности)
-* Добавить иконку прихожения
+* Добавить музыку
 * Разобраться в запуске приложения на устройствах без компилятора (возможно ли?)
 
 ___
