@@ -1,87 +1,91 @@
 #include "life_frontend.h"
-#include <Windows.h>
 
-life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath, const std::string &sdl2mixerLibraryPath) {
+//life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath, const std::string &sdl2mixerLibraryPath) {
+life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
     sdl_lib_path = sdlLibraryPath;
-    sdl_lib_handle = LoadLibrary(sdl_lib_path.c_str());
+    sdl_lib_handle = LOAD_LIBRARY(sdl_lib_path.c_str());
 
-    sdl2mixer_lib_path = sdl2mixerLibraryPath;
-    sdl2mixer_lib_handle = LoadLibrary(sdl2mixer_lib_path.c_str());
+//    sdl2mixer_lib_path = sdl2mixerLibraryPath;
+//    sdl2mixer_lib_handle = LoadLibrary(sdl2mixer_lib_path.c_str());
 
-    SDL_Init_Func = (int (*)(Uint32)) GetProcAddress(sdl_lib_handle, "SDL_Init");
+    SDL_Init_Func = (int (*)(Uint32)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_Init");
 
-    Mix_Init_Func = (int (*)(int)) GetProcAddress(sdl2mixer_lib_handle, "Mix_Init");
+//    Mix_Init_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_Init");
 
-    SDL_CreateWindow_Func = (SDL_Window *(*)(const char *, int, int, int, int, Uint32)) GetProcAddress(sdl_lib_handle,
+    SDL_CreateWindow_Func = (SDL_Window *(*)(const char *, int, int, int, int, Uint32)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                                        "SDL_CreateWindow");
-    SDL_CreateRenderer_Func = (SDL_Renderer *(*)(SDL_Window *, int, Uint32)) GetProcAddress(sdl_lib_handle,
+    SDL_CreateRenderer_Func = (SDL_Renderer *(*)(SDL_Window *, int, Uint32)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                             "SDL_CreateRenderer");
-    SDL_SetRenderDrawColor_Func = (int (*)(SDL_Renderer *, Uint8, Uint8, Uint8, Uint8)) GetProcAddress(sdl_lib_handle,
+    SDL_SetRenderDrawColor_Func = (int (*)(SDL_Renderer *, Uint8, Uint8, Uint8, Uint8)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                                        "SDL_SetRenderDrawColor");
-    SDL_Quit_Func = (void (*)(void)) GetProcAddress(sdl_lib_handle, "SDL_Quit");
-    SDL_DestroyWindow_Func = (int (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_DestroyWindow");
-    SDL_Delay_Func = (void (*)(Uint32)) GetProcAddress(sdl_lib_handle, "SDL_Delay");
-    SDL_RenderDrawLine_Func = (int (*)(SDL_Renderer *, int, int, int, int)) GetProcAddress(sdl_lib_handle,
+    SDL_Quit_Func = (void (*)(void)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_Quit");
+    SDL_DestroyWindow_Func = (int (*)(SDL_Window *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_DestroyWindow");
+    SDL_Delay_Func = (void (*)(Uint32)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_Delay");
+    SDL_RenderDrawLine_Func = (int (*)(SDL_Renderer *, int, int, int, int)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                            "SDL_RenderDrawLine");
-    SDL_RenderClear_Func = (int (*)(SDL_Renderer *)) GetProcAddress(sdl_lib_handle, "SDL_RenderClear");
-    SDL_RenderFillRect_Func = (int (*)(SDL_Renderer *, const SDL_Rect *)) GetProcAddress(sdl_lib_handle,
+    SDL_RenderClear_Func = (int (*)(SDL_Renderer *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_RenderClear");
+    SDL_RenderFillRect_Func = (int (*)(SDL_Renderer *, const SDL_Rect *)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                          "SDL_RenderFillRect");
-    SDL_RenderPresent_Func = (void (*)(SDL_Renderer *)) GetProcAddress(sdl_lib_handle, "SDL_RenderPresent");
-    SDL_PollEvent_Func = (int (*)(SDL_Event *)) GetProcAddress(sdl_lib_handle, "SDL_PollEvent");
-    SDL_DestroyRenderer_Func = (void (*)(SDL_Renderer *)) GetProcAddress(sdl_lib_handle, "SDL_DestroyRenderer");
+    SDL_RenderPresent_Func = (void (*)(SDL_Renderer *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_RenderPresent");
+    SDL_PollEvent_Func = (int (*)(SDL_Event *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_PollEvent");
+    SDL_DestroyRenderer_Func = (void (*)(SDL_Renderer *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_DestroyRenderer");
 
-    SDL_GetWindowSurface_Func = (SDL_Surface *(*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowSurface");
+    SDL_GetWindowSurface_Func = (SDL_Surface *(*)(SDL_Window *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_GetWindowSurface");
 
-    SDL_FillRect_Func = (int (*)(SDL_Surface *, const SDL_Rect *, Uint32)) GetProcAddress(sdl_lib_handle,
+    SDL_FillRect_Func = (int (*)(SDL_Surface *, const SDL_Rect *, Uint32)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                           "SDL_FillRect");
 
-    SDL_UpdateWindowSurface_Func = (int (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_UpdateWindowSurface");
+    SDL_UpdateWindowSurface_Func = (int (*)(SDL_Window *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_UpdateWindowSurface");
 
-    SDL_MapRGB_Func = (Uint32 (*)(const SDL_PixelFormat *, Uint8, Uint8, Uint8)) GetProcAddress(sdl_lib_handle,
+    SDL_MapRGB_Func = (Uint32 (*)(const SDL_PixelFormat *, Uint8, Uint8, Uint8)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                                 "SDL_MapRGB");
 
-    SDL_SetWindowTitle_Func = (void (*)(SDL_Window *, const char *)) GetProcAddress(sdl_lib_handle,
+    SDL_SetWindowTitle_Func = (void (*)(SDL_Window *, const char *)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                     "SDL_SetWindowTitle");
 
-    SDL_GetMouseState_Func = (Uint32 (*)(int *, int *)) GetProcAddress(sdl_lib_handle, "SDL_GetMouseState");
+    SDL_GetMouseState_Func = (Uint32 (*)(int *, int *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_GetMouseState");
 
-    SDL_SetWindowGrab_Func = (void (*)(SDL_Window *, SDL_bool)) GetProcAddress(sdl_lib_handle, "SDL_SetWindowGrab");
+    SDL_SetWindowGrab_Func = (void (*)(SDL_Window *, SDL_bool)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_SetWindowGrab");
 
-    SDL_GetWindowSize_Func = (void (*)(SDL_Window *, int *, int *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowSize");
+    SDL_GetWindowSize_Func = (void (*)(SDL_Window *, int *, int *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_GetWindowSize");
 
-    SDL_SetWindowSize_Func = (void (*)(SDL_Window *, int, int)) GetProcAddress(sdl_lib_handle, "SDL_SetWindowSize");
+    SDL_SetWindowSize_Func = (void (*)(SDL_Window *, int, int)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_SetWindowSize");
 
-    SDL_GetWindowGrab_Func = (SDL_bool (*)(SDL_Window *)) GetProcAddress(sdl_lib_handle, "SDL_GetWindowGrab");
+    SDL_GetWindowGrab_Func = (SDL_bool (*)(SDL_Window *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_GetWindowGrab");
 
-    SDL_RWFromFile_Func = (SDL_RWops *(*)(const char *, const char *)) GetProcAddress(sdl_lib_handle, "SDL_RWFromFile");
+    SDL_RWFromFile_Func = (SDL_RWops *(*)(const char *, const char *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_RWFromFile");
 
-    SDL_LoadBMP_RW_Func = (SDL_Surface *(*)(SDL_RWops *, int)) GetProcAddress(sdl_lib_handle, "SDL_LoadBMP_RW");
+    SDL_LoadBMP_RW_Func = (SDL_Surface *(*)(SDL_RWops *, int)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_LoadBMP_RW");
 
-    SDL_SetWindowIcon_Func = (void (*)(SDL_Window *, SDL_Surface *)) GetProcAddress(sdl_lib_handle,
+    SDL_SetWindowIcon_Func = (void (*)(SDL_Window *, SDL_Surface *)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                     "SDL_SetWindowIcon");
 
-    SDL_FreeSurface_Func = (void (*)(SDL_Surface *)) GetProcAddress(sdl_lib_handle, "SDL_FreeSurface");
+    SDL_FreeSurface_Func = (void (*)(SDL_Surface *)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_FreeSurface");
 
-    IMG_Load_Func = (SDL_Surface *(*)(const char *)) GetProcAddress(sdl_lib_handle, "IMG_Load");
+    IMG_Load_Func = (SDL_Surface *(*)(const char *)) GET_PROC_ADDRESS(sdl_lib_handle, "IMG_Load");
 
-    Mix_OpenAudio_Func = (int (*)(int, Uint16, int, int)) GetProcAddress(sdl2mixer_lib_handle, "Mix_OpenAudio");
-
-    Mix_LoadMUS_Func = (Mix_Music * (*)(const char *)) GetProcAddress(sdl2mixer_lib_handle, "Mix_LoadMUS");
-
-    Mix_FreeMusic_Func = (void (*)(Mix_Music *)) GetProcAddress(sdl2mixer_lib_handle, "Mix_FreeMusic");
-
-    Mix_CloseAudio_Func = (void (*)(void)) GetProcAddress(sdl2mixer_lib_handle, "Mix_CloseAudio");
-
-    Mix_PlayMusic_Func = (int (*)(Mix_Music *, int)) GetProcAddress(sdl2mixer_lib_handle, "Mix_PlayMusic");
-
-    SDL_GetError_Func = (const char* (*)(void)) GetProcAddress(sdl_lib_handle, "SDL_GetError");
-
-    Mix_PlayingMusic_Func = (int (*)(void)) GetProcAddress(sdl2mixer_lib_handle, "Mix_PlayingMusic");
+//    Mix_OpenAudio_Func = (int (*)(int, Uint16, int, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_OpenAudio");
+//
+//    Mix_LoadMUS_Func = (Mix_Music * (*)(const char *)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_LoadMUS");
+//
+//    Mix_FreeMusic_Func = (void (*)(Mix_Music *)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_FreeMusic");
+//
+//    Mix_CloseAudio_Func = (void (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_CloseAudio");
+//
+//    Mix_PlayMusic_Func = (int (*)(Mix_Music *, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_PlayMusic");
+//
+    SDL_GetError_Func = (const char* (*)(void)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_GetError");
+//
+//    Mix_PlayingMusic_Func = (int (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_PlayingMusic");
+//
+//    Mix_LoadWAV_RW_Func = (Mix_Chunk * (*)(SDL_RWops *, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_LoadWAV_RW");
+//
+//    Mix_VolumeMusic_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_VolumeMusic");
 }
 
 life_frontend::life_frontend::~life_frontend() {
     this->SDL_Quit();
-    FreeLibrary(sdl_lib_handle); // Unload the SDL library
+    FREE_LIBRARY(sdl_lib_handle); // Unload the SDL library
 }
 
 int life_frontend::life_frontend::SDL_Init(Uint32 flags) {
@@ -107,8 +111,6 @@ int life_frontend::life_frontend::SDL_SetRenderDrawColor(SDL_Renderer *renderer,
 
 void life_frontend::life_frontend::SDL_Quit(void) {
     SDL_Quit_Func();
-
-
 }
 
 int life_frontend::life_frontend::SDL_DestroyWindow(SDL_Window *window) {
@@ -211,34 +213,118 @@ SDL_Surface *life_frontend::life_frontend::IMG_Load(const char *file) {
     return IMG_Load_Func(file);
 }
 
-int life_frontend::life_frontend::Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
-    return Mix_OpenAudio_Func(frequency, format, channels, chunksize);
-}
-
-Mix_Music * life_frontend::life_frontend::Mix_LoadMUS(const char * file) {
-    return Mix_LoadMUS_Func(file);
-}
-
-void life_frontend::life_frontend::Mix_FreeMusic(Mix_Music * music) {
-    Mix_FreeMusic_Func(music);
-}
-
-void life_frontend::life_frontend::Mix_CloseAudio() {
-    Mix_CloseAudio_Func();
-}
-
-int life_frontend::life_frontend::Mix_PlayMusic(Mix_Music * music, int loops) {
-    return Mix_PlayMusic_Func(music, loops);
-}
-
-int life_frontend::life_frontend::Mix_Init(int flags) {
-    return Mix_Init_Func(flags);
-}
+//int life_frontend::life_frontend::Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
+//    return Mix_OpenAudio_Func(frequency, format, channels, chunksize);
+//}
+//
+//Mix_Music * life_frontend::life_frontend::Mix_LoadMUS(const char * file) {
+//    return Mix_LoadMUS_Func(file);
+//}
+//
+//void life_frontend::life_frontend::Mix_FreeMusic(Mix_Music * music) {
+//    Mix_FreeMusic_Func(music);
+//}
+//
+//void life_frontend::life_frontend::Mix_CloseAudio() {
+//    Mix_CloseAudio_Func();
+//}
+//
+//int life_frontend::life_frontend::Mix_PlayMusic(Mix_Music * music, int loops) {
+//    return Mix_PlayMusic_Func(music, loops);
+//}
+//
+//int life_frontend::life_frontend::Mix_Init(int flags) {
+//    return Mix_Init_Func(flags);
+//}
 
 const char* life_frontend::life_frontend::SDL_GetError() {
     return SDL_GetError_Func();
 }
 
-int life_frontend::life_frontend::Mix_PlayingMusic(void) {
+//int life_frontend::life_frontend::Mix_PlayingMusic(void) {
+//    return Mix_PlayingMusic_Func();
+//}
+//
+//Mix_Chunk * life_frontend::life_frontend::Mix_LoadWAV_RW(SDL_RWops * src, int freesrc) {
+//    return Mix_LoadWAV_RW_Func(src, freesrc);
+//}
+//
+//int life_frontend::life_frontend::Mix_VolumeMusic(int volume) {
+//    return Mix_VolumeMusic_Func(volume);
+//}
+
+life_frontend::SDL_MUSIC::SDL_MUSIC(const std::string &sdl2mixerLibraryPath) {
+    sdl2mixer_lib_path = sdl2mixerLibraryPath;
+    sdl2mixer_lib_handle = LOAD_LIBRARY(sdl2mixer_lib_path.c_str());
+
+    Mix_Init_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_Init");
+
+    Mix_Quit_Func = (void (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_Quit");
+
+    Mix_OpenAudio_Func = (int (*)(int, Uint16, int, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_OpenAudio");
+
+    Mix_LoadMUS_Func = (Mix_Music * (*)(const char *)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_LoadMUS");
+
+    Mix_FreeMusic_Func = (void (*)(Mix_Music *)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_FreeMusic");
+
+    Mix_CloseAudio_Func = (void (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_CloseAudio");
+
+    Mix_PlayMusic_Func = (int (*)(Mix_Music *, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_PlayMusic");
+
+    Mix_PlayingMusic_Func = (int (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_PlayingMusic");
+
+    Mix_LoadWAV_RW_Func = (Mix_Chunk * (*)(SDL_RWops *, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_LoadWAV_RW");
+
+    Mix_VolumeMusic_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_VolumeMusic");
+
+    Mix_Volume_Func = (int (*)(int, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_Volume");
+}
+
+life_frontend::SDL_MUSIC::~SDL_MUSIC(){
+    this->Mix_Quit();
+    FREE_LIBRARY(sdl2mixer_lib_handle);
+}
+
+int life_frontend::SDL_MUSIC::Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
+    return Mix_OpenAudio_Func(frequency, format, channels, chunksize);
+}
+
+Mix_Music * life_frontend::SDL_MUSIC::Mix_LoadMUS(const char * file) {
+    return Mix_LoadMUS_Func(file);
+}
+
+void life_frontend::SDL_MUSIC::Mix_FreeMusic(Mix_Music * music) {
+    Mix_FreeMusic_Func(music);
+}
+
+void life_frontend::SDL_MUSIC::Mix_CloseAudio() {
+    Mix_CloseAudio_Func();
+}
+
+int life_frontend::SDL_MUSIC::Mix_PlayMusic(Mix_Music * music, int loops) {
+    return Mix_PlayMusic_Func(music, loops);
+}
+
+int life_frontend::SDL_MUSIC::Mix_Init(int flags) {
+    return Mix_Init_Func(flags);
+}
+
+int life_frontend::SDL_MUSIC::Mix_PlayingMusic(void) {
     return Mix_PlayingMusic_Func();
+}
+
+Mix_Chunk * life_frontend::SDL_MUSIC::Mix_LoadWAV_RW(SDL_RWops * src, int freesrc) {
+    return Mix_LoadWAV_RW_Func(src, freesrc);
+}
+
+int life_frontend::SDL_MUSIC::Mix_VolumeMusic(int volume) {
+    return Mix_VolumeMusic_Func(volume);
+}
+
+void life_frontend::SDL_MUSIC::Mix_Quit(void) {
+    Mix_Quit_Func();
+}
+
+int life_frontend::SDL_MUSIC::Mix_Volume(int channel, int volume) {
+    return Mix_Volume_Func(channel, volume);
 }

@@ -18,6 +18,37 @@
 
 #include <thread>
 
+namespace {
+    std::filesystem::path getExecutablePath() {
+        char path[1024];
+#if defined(_WIN32) || defined(_WIN64)
+        GetModuleFileName(NULL, path, sizeof(path));
+        return std::string(path);
+#elif defined(__linux__)
+        ssize_t len = ::readlink("/proc/self/exe", path, sizeof(path) - 1);
+        if (len != -1)
+        {
+            path[len] = '\0';
+            return std::string(path);
+        }
+#elif defined(__APPLE__)
+        uint32_t size = sizeof(path);
+        if (_NSGetExecutablePath(path, &size) == 0) {
+            return std::filesystem::path(std::string(path));
+        }
+#endif
+
+        return std::string();
+    }
+}
+
+auto pathToExecutable = ::getExecutablePath();
+auto pathToDirWhereExecutable = std::filesystem::path(pathToExecutable.string()).parent_path().parent_path();
+std::string SDL_LIBRARY_NAME = MY_VARIABLE;
+std::string SDL2MIXER_LIBRARY_NAME = SDL2MIXER;
+static auto pathToSdlLibrary = pathToDirWhereExecutable / "life_frontend" / MY_VARIABLE;
+static auto pathToSdl2MixerLibrary = pathToDirWhereExecutable / "life_frontend" / SDL2MIXER;
+
 static int R = 255;
 static int G = 0;
 static int B = 0;
@@ -31,6 +62,7 @@ static bool isMeme = false;
 static bool isDraw = false;
 static bool isShift = false;
 static bool isRGB = false;
+static bool isPlayMusic = false;
 static char action;
 static int cellSizeX = 15;
 static int cellSizeY = 15;
@@ -233,60 +265,14 @@ void events(SDL_Window *window, life_frontend::life_frontend &front, life_backen
                 isRGB = !isRGB;
                 reTitle = true;
                 break;
+            case SDLK_m:
+                isPlayMusic = true;
         }
     }
 }
 
-/// "esc" - escape
-/// "p" - pause
-/// "x" - clear
-/// "r" - random fill
-/// "+" - FPS up
-/// "-" - FPS down
-/// ">" - RGB speed up
-/// "<" - RGB speed down
-/// "6" - meme
-/// LMB - set alive cell
-/// RMB - set ded cell
-/// MB + move - draw with type of cell
-
-namespace {
-    std::filesystem::path getExecutablePath() {
-        char path[1024];
-#if defined(_WIN32) || defined(_WIN64)
-        GetModuleFileName(NULL, path, sizeof(path));
-        return std::string(path);
-#elif defined(__linux__)
-        ssize_t len = ::readlink("/proc/self/exe", path, sizeof(path) - 1);
-        if (len != -1)
-        {
-            path[len] = '\0';
-            return std::string(path);
-        }
-#elif defined(__APPLE__)
-        uint32_t size = sizeof(path);
-        if (_NSGetExecutablePath(path, &size) == 0) {
-            return std::filesystem::path(std::string(path));
-        }
-#endif
-
-        return std::string();
-    }
-}
-
-#if defined(_WIN32) || defined(_WIN64)
-    int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
-#elif defined(__linux__)
-    int main(int argc, char **argv)
-#endif
-{
-    auto pathToExecutable = ::getExecutablePath();
-    auto pathToDirWhereExecutable = std::filesystem::path(pathToExecutable.string()).parent_path().parent_path();
-    std::string SDL_LIBRARY_NAME = MY_VARIABLE;
-    std::string SDL2MIXER_LIBRARY_NAME = SDL2MIXER;
-    auto pathToSdlLibrary = pathToDirWhereExecutable / "life_frontend" / MY_VARIABLE;
-    auto pathToSdl2MixerLibrary = pathToDirWhereExecutable / "life_frontend" / SDL2MIXER;
-    life_frontend::life_frontend front(pathToSdlLibrary.string(), pathToSdl2MixerLibrary.string());
+void play_game() {
+    life_frontend::life_frontend front(pathToSdlLibrary.string());
 
     life_backend::Life life(15, 15);
 
@@ -295,20 +281,7 @@ namespace {
 
     createNewTitle();
 
-    front.SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-
-//    front.Mix_Init(MIX_INIT_MP3);
-
-    front.Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
-
-    Mix_Music *music = front.Mix_LoadMUS("D:\\game_of_shiza_3.0\\life_frontend\\src\\Freddy.wav");
-//    if (!music) {
-//        std::cerr << "Ошибка загрузки музыки: " << front.Mix_GetError() << std::endl;
-//    } else {
-//        front.Mix_PlayMusic(music, 10);
-//    }
-
-    front.Mix_PlayMusic(music, 3);
+    front.SDL_Init(SDL_INIT_VIDEO);
 
 
     SDL_Window *window = front.SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
@@ -352,13 +325,139 @@ namespace {
             front.SDL_Delay(1);
         }
     }
-    front.Mix_FreeMusic(music);
-
-    // Закрытие аудио SDL2_mixer
-    front.Mix_CloseAudio();
 
     front.SDL_DestroyWindow(window);
     front.SDL_Quit();
+}
+
+void play_music() {
+    life_frontend::SDL_MUSIC sdl_music(pathToSdl2MixerLibrary.string());
+
+    sdl_music.Mix_Init(SDL_INIT_AUDIO);
+
+//    sdl_music.Mix_Init(MIX_INIT_OGG);
+
+
+    sdl_music.Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096);
+
+    Mix_Music *music = sdl_music.Mix_LoadMUS("Freddy.wav");
+
+    sdl_music.Mix_Volume(-1, MIX_MAX_VOLUME);
+    sdl_music.Mix_VolumeMusic(MIX_MAX_VOLUME);
+
+    while(!quit) {
+        if (!sdl_music.Mix_PlayingMusic()) {
+            sdl_music.Mix_PlayMusic(music, 10);
+        }
+    }
+
+    sdl_music.Mix_FreeMusic(music);
+
+    sdl_music.Mix_CloseAudio();
+}
+
+/// "esc" - escape
+/// "p" - pause
+/// "x" - clear
+/// "r" - random fill
+/// "+" - FPS up
+/// "-" - FPS down
+/// ">" - RGB speed up
+/// "<" - RGB speed down
+/// "6" - meme
+/// LMB - set alive cell
+/// RMB - set ded cell
+/// MB + move - draw with type of cell
+
+#if defined(_WIN32) || defined(_WIN64)
+    int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+#elif defined(__linux__)
+    int main(int argc, char **argv)
+#endif
+{
+//    life_frontend::life_frontend front(pathToSdlLibrary.string());
+//    life_frontend::SDL_MUSIC sdl_music(pathToSdl2MixerLibrary.string());
+
+//    life_backend::Life life(15, 15);
+//
+//    int width = life.getWidth();
+//    int height = life.getHeight();
+
+//    createNewTitle();
+
+//    front.SDL_Init(SDL_INIT_VIDEO);
+//    sdl_music.Mix_Init(SDL_INIT_AUDIO);
+//
+//    sdl_music.Mix_Init(MIX_INIT_MP3);
+//
+//    sdl_music.Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+//
+//    Mix_Music *music = sdl_music.Mix_LoadMUS("C:\\Users\\user\\CLionProjects\\GTT\\life_frontend\\src\\Freddy.wav");
+//    if (!music) {
+//        std::cerr << "Ошибка загрузки музыки: " << front.Mix_GetError() << std::endl;
+//    } else {
+//        front.Mix_PlayMusic(music, 10);
+//    }
+
+//    sdl_music.Mix_VolumeMusic(100);
+
+
+//    SDL_Window *window = front.SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
+//                                                SDL_WINDOWPOS_CENTERED,
+//                                                width * cellSizeX + 1, height * cellSizeY + 1,
+//                                                SDL_WINDOW_RESIZABLE);
+
+//    SDL_Surface *icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);  // ленька
+//    if (icon != nullptr) {
+//        front.SDL_SetWindowIcon(window, icon);
+//        front.SDL_FreeSurface(icon);
+//    }
+//
+//    SDL_Renderer *renderer = front.SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+
+
+//    SDL_Event event;
+//    while (!quit) {
+//        sdl_music.Mix_PlayMusic(music, 100);
+//
+//        while (front.SDL_PollEvent(&event)) {
+//            events(window, front, life, event);
+//        }
+//
+//        if (reTitle) {
+//            createNewTitle();
+//            front.SDL_SetWindowTitle(window, title.c_str());
+//            reTitle = false;
+//        }
+//
+//        if (reRender || isDraw) {
+//            renderWindowWithGrid(renderer, front, life);
+//            reRender = false;
+//        }
+//
+//        if (isPlay) {
+//            life.updateCellStates();
+//            renderWindowWithGrid(renderer, front, life);
+//            front.SDL_Delay(ms);
+//        } else {
+//            front.SDL_Delay(1);
+//        }
+//    }
+//    sdl_music.Mix_FreeMusic(music);
+//
+//    // Закрытие аудио SDL2_mixer
+//    sdl_music.Mix_CloseAudio();
+
+//    front.SDL_DestroyWindow(window);
+//    front.SDL_Quit();
+
+    std::thread game_thread(play_game);
+    std::thread music_thread(play_music);
+
+    game_thread.join();
+    music_thread.join();
+
     return 0;
 }
 //}

@@ -1,21 +1,33 @@
 #pragma once
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
-#include <Windows.h>
 #include "SDL_rwops.h"
 #include "SDL_mixer.h"
 #include <string>
 
+#if defined(_WIN32) || defined(_WIN64)
+    #include <Windows.h>
+    #define GET_PROC_ADDRESS GetProcAddress
+    #define LOAD_LIBRARY LoadLibrary
+    #define FREE_LIBRARY FreeLibrary
+#elif defined(__linux__)
+    #include <dlfcn.h>
+    #define GET_PROC_ADDRESS dlsym
+    #define LOAD_LIBRARY dlopen
+    #define FREE_LIBRARY dlclose
+#endif
+
 namespace life_frontend {
     class life_frontend {
     public:
-        explicit life_frontend(const std::string &sdlLibraryPath, const std::string &sdl2mixerLibraryPath);
+//        explicit life_frontend(const std::string &sdlLibraryPath, const std::string &sdl2mixerLibraryPath);
+        explicit life_frontend(const std::string &sdlLibraryPath);
 
         ~life_frontend();
 
         int SDL_Init(Uint32 flags);
 
-        int Mix_Init(int flags);
+//        int Mix_Init(int flags);
 
         SDL_Window *SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags);
 
@@ -71,30 +83,35 @@ namespace life_frontend {
 
         SDL_Surface * IMG_Load(const char *file);
 
-        int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize);
-
-        Mix_Music * Mix_LoadMUS(const char * file);
-
-        void Mix_FreeMusic(Mix_Music * music);
-
-        void Mix_CloseAudio(void);
-
-        int Mix_PlayMusic(Mix_Music *music, int loops);
-
+//        int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize);
+//
+//        Mix_Music * Mix_LoadMUS(const char * file);
+//
+//        void Mix_FreeMusic(Mix_Music * music);
+//
+//        void Mix_CloseAudio(void);
+//
+//        int Mix_PlayMusic(Mix_Music *music, int loops);
+//
         const char* SDL_GetError(void);
+//
+//        int Mix_PlayingMusic(void);
+//
+//        Mix_Chunk * Mix_LoadWAV_RW(SDL_RWops * src, int freesrc);
+//
+//        int Mix_VolumeMusic(int volume);
 
-        int Mix_PlayingMusic(void);
 
     private:
         std::string sdl_lib_path;
         HMODULE sdl_lib_handle;
 
-        std::string sdl2mixer_lib_path;
-        HMODULE sdl2mixer_lib_handle;
+//        std::string sdl2mixer_lib_path;
+//        HMODULE sdl2mixer_lib_handle;
 
         int (*SDL_Init_Func)(Uint32 flags) = nullptr;
 
-        int (*Mix_Init_Func)(int flags) = nullptr;
+//        int (*Mix_Init_Func)(int flags) = nullptr;
 
         void (*SDL_Quit_Func)(void) = nullptr;
 
@@ -150,6 +167,62 @@ namespace life_frontend {
 
         SDL_Surface* (*IMG_Load_Func)(const char *file) = nullptr;
 
+//        int (*Mix_OpenAudio_Func)(int frequency, Uint16 format, int channels, int chunksize) = nullptr;
+
+//        Mix_Music * (*Mix_LoadMUS_Func)(const char * file) = nullptr;
+//
+//        void (*Mix_FreeMusic_Func)(Mix_Music * music) = nullptr;
+//
+//        void (*Mix_CloseAudio_Func)(void) = nullptr;
+//
+//        int (*Mix_PlayMusic_Func)(Mix_Music *music, int loops) = nullptr;
+//
+        const char* (*SDL_GetError_Func)(void) = nullptr;
+//
+//        int (*Mix_PlayingMusic_Func)(void) = nullptr;
+//
+//        Mix_Chunk * (*Mix_LoadWAV_RW_Func)(SDL_RWops * src, int freesrc) = nullptr;
+//
+//        int (*Mix_VolumeMusic_Func)(int volume) = nullptr;
+    };
+
+    class SDL_MUSIC {
+    public:
+        SDL_MUSIC(const std::string &sdl2mixerLibraryPath);
+
+        ~SDL_MUSIC();
+
+        void Mix_Quit(void);
+
+        int Mix_Init(int flags);
+
+        int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize);
+
+        Mix_Music * Mix_LoadMUS(const char * file);
+
+        void Mix_FreeMusic(Mix_Music * music);
+
+        void Mix_CloseAudio(void);
+
+        int Mix_PlayMusic(Mix_Music *music, int loops);
+
+        int Mix_PlayingMusic(void);
+
+        Mix_Chunk * Mix_LoadWAV_RW(SDL_RWops * src, int freesrc);
+
+        int Mix_VolumeMusic(int volume);
+
+        int Mix_Volume(int channel, int volume);
+
+    private:
+
+        std::string sdl2mixer_lib_path;
+        HMODULE sdl2mixer_lib_handle;
+
+        int (*Mix_Init_Func)(int flags) = nullptr;
+
+        void (*Mix_Quit_Func)(void) = nullptr;
+
         int (*Mix_OpenAudio_Func)(int frequency, Uint16 format, int channels, int chunksize) = nullptr;
 
         Mix_Music * (*Mix_LoadMUS_Func)(const char * file) = nullptr;
@@ -160,8 +233,13 @@ namespace life_frontend {
 
         int (*Mix_PlayMusic_Func)(Mix_Music *music, int loops) = nullptr;
 
-        const char* (*SDL_GetError_Func)(void) = nullptr;
-
         int (*Mix_PlayingMusic_Func)(void) = nullptr;
+
+        Mix_Chunk * (*Mix_LoadWAV_RW_Func)(SDL_RWops * src, int freesrc) = nullptr;
+
+        int (*Mix_VolumeMusic_Func)(int volume) = nullptr;
+
+        int (*Mix_Volume_Func)(int channel, int volume) = nullptr;
     };
+
 }
