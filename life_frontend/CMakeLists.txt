@@ -27,37 +27,35 @@ elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86")
 elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
     message("Target architecture: AMD64")
     set(ARCH "x64")
-elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86-64")
-    message("Target architecture: x86-64")
-    set(ARCH "x64"
-    )
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    message("Target architecture: x86_64")
+    set(ARCH "x64")
 else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 cmake_path(APPEND SDL_INCLUDE_PATH "${CMAKE_SOURCE_DIR}" "libraries" "include" "SDL2")
-#cmake_path(APPEND SDL2MIXER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}" "libraries" "include" "SDL2_mixer")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CURRENT_OS "Linux")
     set(CURRENT_EXT "so")
-    cmake_path(APPEND SDL_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "SDL2.${CURRENT_EXT}")
-    cmake_path(APPEND SDL2MIXER_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "SDL2_mixer.${CURRENT_EXT}")
+    set(MY_VARIABLE "libSDL2.${CURRENT_EXT}")
+    set(SDL2MIXER "libSDL2_mixer.${CURRENT_EXT}")
+    cmake_path(APPEND SDL_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "libSDL2.${CURRENT_EXT}")
+    cmake_path(APPEND SDL2MIXER_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "libSDL2_mixer.${CURRENT_EXT}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy ${SDL_PATH_FULL} ${MY_VARIABLE}
             COMMAND ${CMAKE_COMMAND} -E copy ${SDL2MIXER_PATH_FULL} ${SDL2MIXER}
     )
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-            LINK_FLAGS "-Wl,--export-dynamic"
-    )
+    set(CMAKE_EXE_LINKER_FLAGS "-Wl,-export-dynamic")
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CURRENT_OS "Windows")
     set(CURRENT_EXT "dll")
     set(MY_VARIABLE "SDL2.${CURRENT_EXT}")
     set(SDL2MIXER "SDL2_mixer.${CURRENT_EXT}")
-    cmake_path(APPEND SDL_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "SDL2.${CURRENT_EXT}")
+    cmake_path(APPEND SDL_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "SDL2.${CURRENT_EXT}.")
     cmake_path(APPEND SDL2MIXER_PATH_FULL "${CMAKE_SOURCE_DIR}" "libraries" "${ARCH}" "${CURRENT_OS}" "SDL2_mixer.${CURRENT_EXT}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy ${SDL_PATH_FULL} ${MY_VARIABLE}

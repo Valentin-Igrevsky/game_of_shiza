@@ -2,7 +2,13 @@
 
 life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
     sdl_lib_path = sdlLibraryPath;
-    sdl_lib_handle = LOAD_LIBRARY(sdl_lib_path.c_str());
+
+    #if defined(_WIN32) || defined(_WIN64)
+        sdl_lib_handle = LOAD_LIBRARY(sdl_lib_path.c_str());
+    #elif defined(__linux__)
+        sdl_lib_handle = LOAD_LIBRARY(sdl_lib_path.c_str(), RTLD_NOW);
+    #endif
+
 
     SDL_Init_Func = (int (*)(Uint32)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_Init");
 
@@ -197,7 +203,13 @@ const char* life_frontend::life_frontend::SDL_GetError() {
 
 life_frontend::SDL_MUSIC::SDL_MUSIC(const std::string &sdl2mixerLibraryPath) {
     sdl2mixer_lib_path = sdl2mixerLibraryPath;
-    sdl2mixer_lib_handle = LOAD_LIBRARY(sdl2mixer_lib_path.c_str());
+
+    #if defined(_WIN32) || defined(_WIN64)
+        sdl2mixer_lib_handle = LOAD_LIBRARY(sdl2mixer_lib_path.c_str());
+    #elif defined(__linux__)
+        sdl2mixer_lib_handle = LOAD_LIBRARY(sdl2mixer_lib_path.c_str(), RTLD_NOW);
+    #endif
+
 
     Mix_Init_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_Init");
 
