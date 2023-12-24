@@ -64,7 +64,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     )
     set_target_properties(${PROJECT_NAME} PROPERTIES
             WIN32_EXECUTABLE TRUE
-            )
+    )
 else()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
