@@ -1,16 +1,10 @@
 #include "life_frontend.h"
 
-//life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath, const std::string &sdl2mixerLibraryPath) {
 life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
     sdl_lib_path = sdlLibraryPath;
     sdl_lib_handle = LOAD_LIBRARY(sdl_lib_path.c_str());
 
-//    sdl2mixer_lib_path = sdl2mixerLibraryPath;
-//    sdl2mixer_lib_handle = LoadLibrary(sdl2mixer_lib_path.c_str());
-
     SDL_Init_Func = (int (*)(Uint32)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_Init");
-
-//    Mix_Init_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_Init");
 
     SDL_CreateWindow_Func = (SDL_Window *(*)(const char *, int, int, int, int, Uint32)) GET_PROC_ADDRESS(sdl_lib_handle,
                                                                                                        "SDL_CreateWindow");
@@ -64,23 +58,7 @@ life_frontend::life_frontend::life_frontend(const std::string &sdlLibraryPath) {
 
     IMG_Load_Func = (SDL_Surface *(*)(const char *)) GET_PROC_ADDRESS(sdl_lib_handle, "IMG_Load");
 
-//    Mix_OpenAudio_Func = (int (*)(int, Uint16, int, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_OpenAudio");
-//
-//    Mix_LoadMUS_Func = (Mix_Music * (*)(const char *)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_LoadMUS");
-//
-//    Mix_FreeMusic_Func = (void (*)(Mix_Music *)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_FreeMusic");
-//
-//    Mix_CloseAudio_Func = (void (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_CloseAudio");
-//
-//    Mix_PlayMusic_Func = (int (*)(Mix_Music *, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_PlayMusic");
-//
     SDL_GetError_Func = (const char* (*)(void)) GET_PROC_ADDRESS(sdl_lib_handle, "SDL_GetError");
-//
-//    Mix_PlayingMusic_Func = (int (*)(void)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_PlayingMusic");
-//
-//    Mix_LoadWAV_RW_Func = (Mix_Chunk * (*)(SDL_RWops *, int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_LoadWAV_RW");
-//
-//    Mix_VolumeMusic_Func = (int (*)(int)) GET_PROC_ADDRESS(sdl2mixer_lib_handle, "Mix_VolumeMusic");
 }
 
 life_frontend::life_frontend::~life_frontend() {
@@ -213,45 +191,9 @@ SDL_Surface *life_frontend::life_frontend::IMG_Load(const char *file) {
     return IMG_Load_Func(file);
 }
 
-//int life_frontend::life_frontend::Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) {
-//    return Mix_OpenAudio_Func(frequency, format, channels, chunksize);
-//}
-//
-//Mix_Music * life_frontend::life_frontend::Mix_LoadMUS(const char * file) {
-//    return Mix_LoadMUS_Func(file);
-//}
-//
-//void life_frontend::life_frontend::Mix_FreeMusic(Mix_Music * music) {
-//    Mix_FreeMusic_Func(music);
-//}
-//
-//void life_frontend::life_frontend::Mix_CloseAudio() {
-//    Mix_CloseAudio_Func();
-//}
-//
-//int life_frontend::life_frontend::Mix_PlayMusic(Mix_Music * music, int loops) {
-//    return Mix_PlayMusic_Func(music, loops);
-//}
-//
-//int life_frontend::life_frontend::Mix_Init(int flags) {
-//    return Mix_Init_Func(flags);
-//}
-
 const char* life_frontend::life_frontend::SDL_GetError() {
     return SDL_GetError_Func();
 }
-
-//int life_frontend::life_frontend::Mix_PlayingMusic(void) {
-//    return Mix_PlayingMusic_Func();
-//}
-//
-//Mix_Chunk * life_frontend::life_frontend::Mix_LoadWAV_RW(SDL_RWops * src, int freesrc) {
-//    return Mix_LoadWAV_RW_Func(src, freesrc);
-//}
-//
-//int life_frontend::life_frontend::Mix_VolumeMusic(int volume) {
-//    return Mix_VolumeMusic_Func(volume);
-//}
 
 life_frontend::SDL_MUSIC::SDL_MUSIC(const std::string &sdl2mixerLibraryPath) {
     sdl2mixer_lib_path = sdl2mixerLibraryPath;

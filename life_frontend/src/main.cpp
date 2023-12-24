@@ -1,22 +1,9 @@
-#ifdef APPLE
-#include <mach-o/dyld.h>
-#endif
-#if defined(_WIN32)
-
-#include <windows.h>
-
-#else
-#include <unistd.h>
-#endif
-
 #include <filesystem>
+#include <thread>
+
 #include "variables.h"
-
-
 #include "life_backend.h"
 #include "life_frontend.h"
-
-#include <thread>
 
 namespace {
     std::filesystem::path getExecutablePath() {
@@ -57,16 +44,17 @@ static std::vector<int> speedRGB = {1, 5, 17, 51, 85};
 static bool quit = false;
 static bool reTitle = false;
 static bool reRender = false;
+static bool reVolume = true;
 static bool isPlay = true;
 static bool isMeme = false;
 static bool isDraw = false;
 static bool isShift = false;
 static bool isRGB = false;
-static bool isPlayMusic = false;
 static char action;
 static int cellSizeX = 15;
 static int cellSizeY = 15;
 static int ms = 100;
+static int volume = 64;
 static std::string title;
 
 void calculateRGB() {
@@ -87,6 +75,10 @@ void createNewTitle() {
         int FPS = 1000 / ms;
         title += " [ФПС: " + std::to_string(FPS) + "]";
     }
+
+    float tmp_volume = volume;
+    int volume_percent = int((tmp_volume / 128) * 100);
+    title += " [Volume: " + std::to_string(volume_percent) + "%]";
 
     if (isShift) title += " [Mod: Resize]";
     else title += " [Mod: Scale]";
@@ -225,13 +217,13 @@ void events(SDL_Window *window, life_frontend::life_frontend &front, life_backen
                     isPlay = false;
                     reRender = true;
                 }
-            case SDLK_KP_MINUS:
+            case SDLK_MINUS:
                 if (ms < 1000) {
                     ms += 10;
                     reTitle = true;
                 }
                 break;
-            case SDLK_KP_PLUS:
+            case SDLK_EQUALS:
                 if (ms > 10) {
                     ms -= 10;
                     reTitle = true;
@@ -265,8 +257,20 @@ void events(SDL_Window *window, life_frontend::life_frontend &front, life_backen
                 isRGB = !isRGB;
                 reTitle = true;
                 break;
-            case SDLK_m:
-                isPlayMusic = true;
+            case SDLK_UP:
+                if (volume < 128) {
+                    volume += 2;
+                    reTitle = true;
+                    reVolume = true;
+                }
+                break;
+            case SDLK_DOWN:
+                if (volume > 0) {
+                    volume -= 2;
+                    reTitle = true;
+                    reVolume = true;
+                }
+                break;
         }
     }
 }
@@ -296,7 +300,6 @@ void play_game() {
     }
 
     SDL_Renderer *renderer = front.SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
 
 
     SDL_Event event;
@@ -335,17 +338,20 @@ void play_music() {
 
     sdl_music.Mix_Init(SDL_INIT_AUDIO);
 
-//    sdl_music.Mix_Init(MIX_INIT_OGG);
-
-
     sdl_music.Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096);
 
     Mix_Music *music = sdl_music.Mix_LoadMUS("Freddy.wav");
 
-    sdl_music.Mix_Volume(-1, MIX_MAX_VOLUME);
-    sdl_music.Mix_VolumeMusic(MIX_MAX_VOLUME);
+    sdl_music.Mix_Volume(-1, volume);
+    sdl_music.Mix_VolumeMusic(volume);
 
-    while(!quit) {
+    while (!quit) {
+        if (reVolume) {
+            sdl_music.Mix_Volume(-1, volume);
+            sdl_music.Mix_VolumeMusic(volume);
+            reVolume = false;
+        }
+
         if (!sdl_music.Mix_PlayingMusic()) {
             sdl_music.Mix_PlayMusic(music, 10);
         }
@@ -369,89 +375,13 @@ void play_music() {
 /// RMB - set ded cell
 /// MB + move - draw with type of cell
 
+
 #if defined(_WIN32) || defined(_WIN64)
-    int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 #elif defined(__linux__)
-    int main(int argc, char **argv)
+int main(int argc, char **argv)
 #endif
 {
-//    life_frontend::life_frontend front(pathToSdlLibrary.string());
-//    life_frontend::SDL_MUSIC sdl_music(pathToSdl2MixerLibrary.string());
-
-//    life_backend::Life life(15, 15);
-//
-//    int width = life.getWidth();
-//    int height = life.getHeight();
-
-//    createNewTitle();
-
-//    front.SDL_Init(SDL_INIT_VIDEO);
-//    sdl_music.Mix_Init(SDL_INIT_AUDIO);
-//
-//    sdl_music.Mix_Init(MIX_INIT_MP3);
-//
-//    sdl_music.Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
-//
-//    Mix_Music *music = sdl_music.Mix_LoadMUS("C:\\Users\\user\\CLionProjects\\GTT\\life_frontend\\src\\Freddy.wav");
-//    if (!music) {
-//        std::cerr << "Ошибка загрузки музыки: " << front.Mix_GetError() << std::endl;
-//    } else {
-//        front.Mix_PlayMusic(music, 10);
-//    }
-
-//    sdl_music.Mix_VolumeMusic(100);
-
-
-//    SDL_Window *window = front.SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
-//                                                SDL_WINDOWPOS_CENTERED,
-//                                                width * cellSizeX + 1, height * cellSizeY + 1,
-//                                                SDL_WINDOW_RESIZABLE);
-
-//    SDL_Surface *icon = front.SDL_LoadBMP_RW(front.SDL_RWFromFile("lenya.bmp", "rb+"), 1);  // ленька
-//    if (icon != nullptr) {
-//        front.SDL_SetWindowIcon(window, icon);
-//        front.SDL_FreeSurface(icon);
-//    }
-//
-//    SDL_Renderer *renderer = front.SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-
-
-//    SDL_Event event;
-//    while (!quit) {
-//        sdl_music.Mix_PlayMusic(music, 100);
-//
-//        while (front.SDL_PollEvent(&event)) {
-//            events(window, front, life, event);
-//        }
-//
-//        if (reTitle) {
-//            createNewTitle();
-//            front.SDL_SetWindowTitle(window, title.c_str());
-//            reTitle = false;
-//        }
-//
-//        if (reRender || isDraw) {
-//            renderWindowWithGrid(renderer, front, life);
-//            reRender = false;
-//        }
-//
-//        if (isPlay) {
-//            life.updateCellStates();
-//            renderWindowWithGrid(renderer, front, life);
-//            front.SDL_Delay(ms);
-//        } else {
-//            front.SDL_Delay(1);
-//        }
-//    }
-//    sdl_music.Mix_FreeMusic(music);
-//
-//    // Закрытие аудио SDL2_mixer
-//    sdl_music.Mix_CloseAudio();
-
-//    front.SDL_DestroyWindow(window);
-//    front.SDL_Quit();
-
     std::thread game_thread(play_game);
     std::thread music_thread(play_music);
 
@@ -460,4 +390,3 @@ void play_music() {
 
     return 0;
 }
-//}

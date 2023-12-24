@@ -30,6 +30,7 @@ elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
 elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86-64")
     message("Target architecture: x86-64")
     set(ARCH "x64"
+    )
 else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
