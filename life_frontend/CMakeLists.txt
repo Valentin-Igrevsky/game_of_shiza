@@ -47,6 +47,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
             COMMAND ${CMAKE_COMMAND} -E copy ${SDL_PATH_FULL} ${MY_VARIABLE}
             COMMAND ${CMAKE_COMMAND} -E copy ${SDL2MIXER_PATH_FULL} ${SDL2MIXER}
     )
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+            LINK_FLAGS "-Wl,--export-dynamic"
+    )
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CURRENT_OS "Windows")
